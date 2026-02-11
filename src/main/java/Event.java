@@ -1,6 +1,7 @@
 
 // --- Event.java ---
 public class Event extends Task {
+    private static final String EVENT_SYMBOL= "[E]";
     protected String from;
     protected String to;
 
@@ -12,6 +13,6 @@ public class Event extends Task {
 
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";
+        return EVENT_SYMBOL + super.toString() + " (from: " + from + " to: " + to + ")";
     }
 }
