@@ -1,5 +1,6 @@
+package duko.task;
 
-// --- Deadline.java ---
+// --- duke.task.Deadline.java ---
 public class Deadline extends Task {
     private static final String DEADLINE_SYMBOL= "[D]";
     protected String by;

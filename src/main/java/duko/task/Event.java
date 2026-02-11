@@ -1,5 +1,6 @@
+package duko.task;
 
-// --- Event.java ---
+// --- duke.task.Event.java ---
 public class Event extends Task {
     private static final String EVENT_SYMBOL= "[E]";
     protected String from;

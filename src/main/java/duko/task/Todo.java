@@ -1,3 +1,5 @@
+package duko.task;
+
 public class Todo extends Task {
     private static final String TODO_SYMBOL = "[T]";
     public Todo(String description) {

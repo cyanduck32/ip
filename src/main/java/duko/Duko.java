@@ -1,8 +1,16 @@
+package duko;
+
+import duko.exception.DukoException;
+import duko.task.Deadline;
+import duko.task.Event;
+import duko.task.Task;
+import duko.task.Todo;
+
 import java.util.Scanner;
 
 public class Duko {
     static String horizontalLine = "____________________________________________________________";
-    public static String GREETING = "Hello! I'm Duko \nWhat can I do for you?";
+    public static String GREETING = "Hello! I'm Duko\nWhat can I do for you?";
     public static String CLOSING_GREETING = "Bye. Hope to see you again soon!";
     public static Task[] tasks = new Task[100];
     public static int taskCount = 0;
