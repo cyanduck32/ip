@@ -16,4 +16,11 @@ public class Event extends Task {
     public String toString() {
         return EVENT_SYMBOL + super.toString() + " (from: " + from + " to: " + to + ")";
     }
+
+    public String getFrom() {
+        return from;
+    }
+    public String getTo() {
+        return to;
+    }
 }
