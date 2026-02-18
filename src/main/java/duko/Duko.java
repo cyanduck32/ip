@@ -13,6 +13,10 @@ public class Duko {
     static String horizontalLine = "____________________________________________________________";
     public static String GREETING = "Hello! I'm Duko\nWhat can I do for you?";
     public static String CLOSING_GREETING = "Bye. Hope to see you again soon!";
+
+    private static final String FILE_PATH = "./data/duko.txt";
+    private static Storage storage = new Storage(FILE_PATH);
+
     public static ArrayList<Task> tasks = new ArrayList<>();
     //public static Task[] tasks = new Task[100];
     //public static int taskCount = 0;
@@ -25,6 +29,8 @@ public class Duko {
 
 
     public static void main(String[] args) {
+        tasks = storage.load();
+
         System.out.println(horizontalLine + "\n" + LOGO + GREETING + "\n" + horizontalLine);
         Scanner scanner = new Scanner(System.in);
 
@@ -41,9 +47,9 @@ public class Duko {
                 updateTaskStatus(input, true);
             } else if (input.startsWith("unmark")) {
                 updateTaskStatus(input, false);
-            } else if (input.startsWith("delete")){
+            } else if (input.startsWith("delete")) {
                     handleDelete(input);
-            } else if (input.startsWith("todo") || input.startsWith("deadline")||input.startsWith("event")){
+                } else if (input.startsWith("todo") || input.startsWith("deadline")||input.startsWith("event")){
                 handleAddTask(input);
             } else {
                     throw new DukoException("I'm sorry, but I don't know what that command means.");
@@ -97,10 +103,12 @@ public class Duko {
             //tasks[taskCount] = newTask;
             //taskCount++;
             tasks.add(newTask);
+            storage.save(tasks);
             System.out.println(horizontalLine);
             System.out.println("Got it. I've added this task:");
             System.out.println("  " + newTask);
-            System.out.println("Now you have " + tasks.size() + " tasks in the list."); // prev taskCount
+            //System.out.println("Now you have " + taskCount + " tasks in the list.");
+            System.out.println("Now you have " + tasks.size() + " tasks in the list.");
             System.out.println(horizontalLine);
         }
     }
@@ -112,27 +120,25 @@ public class Duko {
 //        }
         try {
             int index = Integer.parseInt(input.split(" ")[1]) - 1;
-//            if (index < 0 || index >= taskCount){
-//                throw new DukoException("That task number does not exist in your list!");
-//            }
+
             validateIndex(index);
             Task task = tasks.get(index);
+
             if (isMark) {
-                //tasks[index].setDone();
                 task.setDone();
                 System.out.println(horizontalLine + "\nNice! I've marked this task as done:\n " + task + "\n" + horizontalLine);
             } else {
-                //tasks[index].unmark();
                 task.unmark();
                 System.out.println(horizontalLine + "\nOK, I've marked this task as not done yet:\n " + task + "\n" + horizontalLine);
             }
+            storage.save(tasks);
 
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException e){
-            throw new DukoException("Please provide a valid number.");
+            throw new DukoException("Please provide a valid task number.");
         }
     }
 
-    private static void validateIndex(int index) throws DukoException {
+    private static void validateIndex(int index) throws DukoException{
         if (index < 0 || index >= tasks.size()){
             throw new DukoException("That task number does not exist in your list!");
         }
@@ -144,6 +150,7 @@ public class Duko {
             validateIndex(index);
 
             Task removedTask = tasks.remove(index);
+            storage.save(tasks);
             System.out.println(horizontalLine);
             System.out.println("Noted. I've removed this task:");
             System.out.println("  " + removedTask);
@@ -156,8 +163,9 @@ public class Duko {
 
     private static void printList() {
         System.out.println(horizontalLine + "\nHere are the tasks in your list:");
-        for (int i = 0; i < tasks.size(); i++) { // changed to tasks.size from taskCount
-            System.out.println((i + 1) + "." + tasks.get(i)); // changed from tasks[i]
+
+        for (int i = 0; i < tasks.size(); i++) { // no more taskCount
+            System.out.println((i + 1) + "." + tasks.get(i)); // no more tasks.get(i);
         }
         System.out.println(horizontalLine);
     }

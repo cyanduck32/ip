@@ -11,4 +11,8 @@ public class Todo extends Task {
 
         return TODO_SYMBOL + super.toString();
     }
+
+    public String getDescription() {
+        return description;
+    }
 }
