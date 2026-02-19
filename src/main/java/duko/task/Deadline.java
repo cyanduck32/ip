@@ -16,6 +16,6 @@ public class Deadline extends Task {
     }
 
     public String getBy() {
-        return description;
+        return by;
     }
 }
