@@ -1,21 +1,23 @@
 package duko.task;
 
-// --- duke.task.Deadline.java ---
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class Deadline extends Task {
-    private static final String DEADLINE_SYMBOL= "[D]";
-    protected String by;
+    protected LocalDate by;
 
     public Deadline(String description, String by) {
         super(description);
-        this.by = by;
+        this.by = LocalDate.parse(by);
     }
 
     @Override
     public String toString() {
-        return DEADLINE_SYMBOL + super.toString() + " (by: " + by + ")";
+        String formattedDate = by.format(DateTimeFormatter.ofPattern("MMM dd yyyy"));
+        return "[D]" + super.toString() + " (by: " + formattedDate + ")";
     }
 
     public String getBy() {
-        return by;
+        return by.toString();
     }
 }

@@ -35,12 +35,21 @@ public class Parser {
 
     private static void handleDeadline(String input, TaskList tasks, Ui ui, Storage storage) throws DukoException {
         String content = input.replaceFirst("deadline", "").trim();
+        if (content.isEmpty()) {
+            throw new DukoException("The description of a deadline cannot be empty.");
+        }
         if (!content.contains(" /by ")) {
-            throw new DukoException("Deadlines must include ' /by ' followed by the time.");
+            throw new DukoException("Deadlines must include ' /by ' followed by the date.");
         }
         String[] parts = content.split(" /by ");
-        Task newTask = new Deadline(parts[0].trim(), parts[1].trim());
-        addTaskAndSave(newTask, tasks, ui, storage);
+        String description = parts[0].trim();
+        String dateString = parts[1].trim();
+        try {
+            Task newTask = new Deadline(description, dateString);
+            addTaskAndSave(newTask, tasks, ui, storage);
+        } catch (java.time.format.DateTimeParseException e) {
+            throw new DukoException("Please use the date format yyyy-mm-dd (e.g., 2026-12-25)");
+        }
     }
 
     private static void handleEvent(String input, TaskList tasks, Ui ui, Storage storage) throws DukoException {
