@@ -1,172 +1,42 @@
 package duko;
 
 import duko.exception.DukoException;
-import duko.task.Deadline;
-import duko.task.Event;
-import duko.task.Task;
-import duko.task.Todo;
-
-import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Duko {
-    static String horizontalLine = "____________________________________________________________";
-    public static String GREETING = "Hello! I'm Duko\nWhat can I do for you?";
-    public static String CLOSING_GREETING = "Bye. Hope to see you again soon!";
+    private Storage storage;
+    private TaskList tasks;
+    private Ui ui;
 
-    private static final String FILE_PATH = "./data/duko.txt";
-    private static Storage storage = new Storage(FILE_PATH);
+    public Duko(String filePath) {
+        ui = new Ui();
+        storage = new Storage(filePath);
+        tasks = new TaskList(storage.load());
+    }
 
-    public static ArrayList<Task> tasks = new ArrayList<>();
-    //public static Task[] tasks = new Task[100];
-    //public static int taskCount = 0;
-    public static String LOGO =  " ____        _        \n"
-            + "|  _ \\ _   _| | _____ \n"
-            + "| | | | | | | |/ / _ \\\n"
-            + "| |_| | |_| |   < | | |\n"
-            + "|____/ \\__,_|_|\\_\\___/\n";
+    public void run() {
+        ui.showWelcome();
+        boolean isExit = false;
 
+        while (!isExit) {
+            String input = ui.readCommand();
+            if (input.equalsIgnoreCase("bye")) {
+                ui.showMessage("Bye. Hope to see you again soon!");
+                isExit = true;
+                continue;
+            }
 
+            try {
+                ui.showLine();
+                Parser.parseAndExecute(input, tasks, ui, storage);
+            } catch (DukoException e) {
+                ui.showError(e.getMessage());
+            } finally {
+                ui.showLine();
+            }
+        }
+    }
 
     public static void main(String[] args) {
-        tasks = storage.load();
-
-        System.out.println(horizontalLine + "\n" + LOGO + GREETING + "\n" + horizontalLine);
-        Scanner scanner = new Scanner(System.in);
-
-        while (scanner.hasNextLine()) {
-            String input = scanner.nextLine().trim();
-
-            try{
-                if (input.equals("bye")) {
-                System.out.println(horizontalLine + "\n" + CLOSING_GREETING + "\n" + horizontalLine);
-                break;
-            } else if (input.equals("list")) {
-                printList();
-            } else if (input.startsWith("mark")) {
-                updateTaskStatus(input, true);
-            } else if (input.startsWith("unmark")) {
-                updateTaskStatus(input, false);
-            } else if (input.startsWith("delete")) {
-                    handleDelete(input);
-                } else if (input.startsWith("todo") || input.startsWith("deadline")||input.startsWith("event")){
-                handleAddTask(input);
-            } else {
-                    throw new DukoException("I'm sorry, but I don't know what that command means.");
-                }
-            } catch (DukoException e){
-                System.out.println(horizontalLine);
-                System.out.println("oh no!" + e.getMessage());
-                System.out.println(horizontalLine);
-            }
-        }
-        scanner.close();
-    }
-
-    private static void handleAddTask(String input) throws DukoException {
-        Task newTask = null;
-
-        if (input.startsWith("todo")) {
-            // "todo borrow book" results in "borrow book"
-            String description = input.replaceFirst("todo", "").trim();
-            if (description.isEmpty()){
-                throw new DukoException("The description of a todo cannot be empty.");
-            }
-            newTask = new Todo(description);
-
-        } else if (input.startsWith("deadline")) {
-            // "deadline return book /by Sunday"
-            String content = input.replaceFirst("deadline", "").trim();
-            if (content.isEmpty()) {
-                throw new DukoException("The description of a deadline cannot be empty.");
-            }
-            if (!content.contains(" /by ")){
-                throw new DukoException("Deadlines must include ' /by ' followed by the time.");
-            }
-            String[] parts = content.split(" /by ");
-            newTask = new Deadline(parts[0].trim(), parts[1].trim());
-
-        } else if (input.startsWith("event")) {
-            // "event meeting /from Mon 2pm /to 4pm"
-            String content = input.replaceFirst("event", "").trim();
-            if (content.isEmpty()){
-                throw new DukoException("The description of an event cannot be empty.");
-            }
-            if (!content.contains(" /from ")||!content.contains(" /to ")){
-                throw new DukoException("Events must include ' /from ' and  ' /to ' timings.");
-            }
-            String[] parts = content.split(" /from | /to");
-            newTask = new Event(parts[0].trim(), parts[1].trim(), parts[2].trim());
-        }
-
-        if (newTask != null) {
-            //tasks[taskCount] = newTask;
-            //taskCount++;
-            tasks.add(newTask);
-            storage.save(tasks);
-            System.out.println(horizontalLine);
-            System.out.println("Got it. I've added this task:");
-            System.out.println("  " + newTask);
-            //System.out.println("Now you have " + taskCount + " tasks in the list.");
-            System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-            System.out.println(horizontalLine);
-        }
-    }
-
-    private static void updateTaskStatus(String input, boolean isMark) throws DukoException {
-//        String[] parts = input.split(" ");
-//        if (parts.length < 2){
-//            throw new DukoException("Please specify a task number to mark/unmark.");
-//        }
-        try {
-            int index = Integer.parseInt(input.split(" ")[1]) - 1;
-
-            validateIndex(index);
-            Task task = tasks.get(index);
-
-            if (isMark) {
-                task.setDone();
-                System.out.println(horizontalLine + "\nNice! I've marked this task as done:\n " + task + "\n" + horizontalLine);
-            } else {
-                task.unmark();
-                System.out.println(horizontalLine + "\nOK, I've marked this task as not done yet:\n " + task + "\n" + horizontalLine);
-            }
-            storage.save(tasks);
-
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e){
-            throw new DukoException("Please provide a valid task number.");
-        }
-    }
-
-    private static void validateIndex(int index) throws DukoException{
-        if (index < 0 || index >= tasks.size()){
-            throw new DukoException("That task number does not exist in your list!");
-        }
-    }
-
-    private static void handleDelete(String input) throws DukoException {
-        try {
-            int index = Integer.parseInt(input.split(" ")[1]) - 1;
-            validateIndex(index);
-
-            Task removedTask = tasks.remove(index);
-            storage.save(tasks);
-            System.out.println(horizontalLine);
-            System.out.println("Noted. I've removed this task:");
-            System.out.println("  " + removedTask);
-            System.out.println("Now you have " + tasks.size() + " tasks in the list.");
-            System.out.println(horizontalLine);
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            throw new DukoException("Please provide a valid task number to delete.");
-        }
-    }
-
-    private static void printList() {
-        System.out.println(horizontalLine + "\nHere are the tasks in your list:");
-
-        for (int i = 0; i < tasks.size(); i++) { // no more taskCount
-            System.out.println((i + 1) + "." + tasks.get(i)); // no more tasks.get(i);
-        }
-        System.out.println(horizontalLine);
+        new Duko("./data/duko.txt").run();
     }
 }
