@@ -3,6 +3,8 @@ package duko;
 import duko.exception.DukoException;
 import duko.task.*;
 
+import java.util.*;
+
 public class Parser {
     public static void parseAndExecute(String input, TaskList tasks, Ui ui, Storage storage) throws DukoException {
         if (input.equals("list")) {
@@ -19,8 +21,33 @@ public class Parser {
             handleDeadline(input, tasks, ui, storage);
         } else if (input.startsWith("event")) {
             handleEvent(input, tasks, ui, storage);
-        } else {
+        } else if (input.startsWith("find")){
+            handleFind(input, tasks, ui);
+        }else {
             throw new DukoException("I'm sorry, but I don't know what that command means.");
+        }
+    }
+
+    private static void handleFind(String input, TaskList tasks, Ui ui) throws DukoException {
+        String keyword = input.replaceFirst("find", "").trim();
+        if (keyword.isEmpty()) {
+            throw new DukoException("Please enter a keyword to search for.");
+        }
+        ArrayList<Task> allTasks = tasks.getTasks();
+        ArrayList<Task> matchingTasks = new ArrayList<>();
+        for (Task task : allTasks) {
+            if (task.getDescription().toLowerCase().contains(keyword.toLowerCase())) {
+                matchingTasks.add(task);
+            }
+        }
+
+        if (matchingTasks.isEmpty()) {
+            ui.showMessage("No matching tasks found with the keyword: " + keyword);
+        } else {
+            ui.showMessage("Here are the matching tasks in your list:");
+            for (int i = 0; i < matchingTasks.size(); i++) {
+                ui.showMessage((i + 1) + "." + matchingTasks.get(i));
+            }
         }
     }
 
