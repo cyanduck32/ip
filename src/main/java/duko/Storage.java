@@ -14,14 +14,27 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Handles the loading and saving of task data to a local file.
+ * This class facilitates the persistence of the TaskList between application sessions.
+ */
 public class Storage {
+    /** The file path where task data is stored. */
     private String filePath;
 
+    /**
+     * Initializes a Storage object with a specific file path.
+     * * @param filePath The relative or absolute path to the data file (e.g., "./data/duko.txt").
+     */
     public Storage(String filePath) {
         this.filePath = filePath;
     }
 
-     // loads tasks from files, handles missing directory/files
+    /**
+     * Loads tasks from the file specified in the file path.
+     * If the file or directory does not exist, an empty list is returned.
+     * * @return An ArrayList of Task objects loaded from the file.
+     */
     public ArrayList<Task> load() {
         ArrayList<Task> loadedTasks = new ArrayList<>();
         File file = new File(filePath);
@@ -45,7 +58,11 @@ public class Storage {
     }
 
 
-    // saves the whole list to the hard disk
+    /**
+     * Saves the current list of tasks to the hard disk.
+     * Creates any missing parent directories before writing to the file.
+     * * @param tasks The ArrayList of Task objects to be saved.
+     */
     public void save(ArrayList<Task> tasks) {
         try {
             // create directories if there is no directory
@@ -64,6 +81,12 @@ public class Storage {
         }
     }
 
+    /**
+     * Converts a Task object into a formatted string suitable for file storage.
+     * Format: TYPE | STATUS | DESCRIPTION | EXTRA_INFO
+     * * @param t The task to convert.
+     * @return A pipe-separated string representing the task.
+     */
     private String toFileFormat(Task t) {
         String type = t instanceof Todo ? "T" : t instanceof Deadline ? "D" : "E";
         String status = t.getStatusIcon().equals("X") ? "1" : "0";
@@ -77,6 +100,11 @@ public class Storage {
         return base;
     }
 
+    /**
+     * Parses a single line from the storage file back into a Task object.
+     * * @param line The string from the data file.
+     * @return The corresponding Task object (Todo, Deadline, or Event), or null if corrupted.
+     */
     private Task parseTaskFromString(String line) {
         try {
             String[] parts = line.split(" \\| ");
@@ -99,7 +127,7 @@ public class Storage {
             if (isDone && task != null) task.setDone();
             return task;
         } catch (Exception e) {
-            return null; // Handle corrupted lines by skipping them
+            return null; // skip corrupted lines
         }
     }
 }
