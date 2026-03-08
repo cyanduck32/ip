@@ -1,26 +1,98 @@
-# duko.Duko project template
+# Duko User Guide
 
-This is a project template for a greenfield Java project. It's named after the Java mascot _Duke_. Given below are instructions on how to use it.
+Duko is a **desktop task management application** optimized for use via a Command Line Interface (CLI). It helps you track various types of tasks—Todos, Deadlines, and Events—with the speed of typing, while providing a clear structured output.
 
-## Setting up in Intellij
+---
 
-Prerequisites: JDK 17, update Intellij to the most recent version.
+## Quick Start
 
-1. Open Intellij (if you are not in the welcome screen, click `File` > `Close Project` to close the existing project first)
-1. Open the project into Intellij as follows:
-   1. Click `Open`.
-   1. Select the project directory, and click `OK`.
-   1. If there are any further prompts, accept the defaults.
-1. Configure the project to use **JDK 17** (not other versions) as explained in [here](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk).<br>
-   In the same dialog, set the **Project language level** field to the `SDK default` option.
-1. After that, locate the `src/main/java/duko.Duko.java` file, right-click it, and choose `Run duko.Duko.main()` (if the code editor is showing compile errors, try restarting the IDE). If the setup is correct, you should see something like the below as the output:
+1. **Prerequisites**: Ensure you have Java 17 or above installed on your computer.
+2. **Download**: Download the latest `duko.jar` file.
+3. **Setup**: Copy the file to the computer you want to use as the home folder for your task list.
+4. **Launch**: 
+    - Open a command terminal and `cd` into that folder. 
+    - Run the application using the command:
+    ```bash
+   java -jar duko.jar
    ```
-   Hello from
-    ____        _        
-   |  _ \ _   _| | _____ 
-   | | | | | | | |/ / _ \
-   | |_| | |_| |   <  __/
-   |____/ \__,_|_|\_\___|
-   ```
+5. **Interact**: A welcome message and the Duko logo will appear. Type a command and press `Enter`.
+### Example commands to try: 
+* `todo read book`: Adds a basic task to your list.
+* `list`: Shows all current tasks.
+* `bye`: Exits the app. 
 
-**Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+---
+
+### Features
+
+###Command Format
+> [!NOTE]
+> * Words in `UPPER_CASE` are the parameters to be supplied by the user.
+> * * *e.g., in `todo DESCRIPTION`, `DESCRIPTION` is a parameter (e.g., `todo buy milk`).*
+> * Items separated by `/` indicate required prefixes for date/time parameters.
+> * Parameters must follow the specific order defined in the format.
+
+### Adding Tasks
+- **Todo**: Adds a task without any specific date or time. 
+  - **Format**: `todo DESCRIPTION`
+  - **Example**: `todo join gym`
+- **Deadline**: Adds a task that needs to be done by a specific date.
+  - **Format**: `deadline DESCRIPTION /by YYYY-MM-DD`
+  - **Example**: `deadline return book /by 2026-06-30`
+- **Event**: Adds a task that spans a specific time frame.
+  - **Format**: `event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD`
+  - **Example**: `event project meeting /from 2026-08-01 /to 2026-08-01`
+
+### Managing the List
+- **Listing**: Shows all tasks including type `[T/D/E]` and status `[X]` (done) or `[ ]` (not done).
+  - **Format**: `list`
+- **Marking Done**: Marks the specified task as completed.
+  - **Format**: `mark INDEX`
+  - *Note: The `INDEX` refers to the number shown in the most recent `list` output.*
+- **Unmarking**: Marks a completed task as not done yet.
+  - **Format**: `unmark INDEX`
+- **Deleting**: removes the task from the list permanently.
+  - **Format**: `delete INDEX`
+
+### Searching & Navigation
+- **Finding**: Finds tasks whos descriptions contain the keyword (case-insensitive).
+  - **Format**: `find KEYWORD`
+- **Exiting**: Exits the Duko application.
+  - **Format**: `bye`
+- ---
+
+## Data Management
+
+### Saving the data
+Duko data is saved to the hard disk **automatically** after any command that changes the list (add, delete, mark). There is no "save" command.
+
+### Editing the data file
+Data is stored as a formatted text file at `./data/duko.txt`. Advanced users can edit this file manually, but ensure you follow the internal format:
+`TYPE | STATUS | DESCRIPTION | EXTRA_INFO`
+
+> [!CAUTION]
+> If the data file's format becomes corrupted through manual editing, Duko may skip those lines or start with an empty list
+
+---
+
+##FAQ
+
+**Q: Why does Duko give an error when I enter a date?** **A:** Duko strictly requires the `YYY-MM-DD` format (e.g., 2026-12-25). Ensure that you are using hyphens and not slashes.
+
+**Q: Where is my data stored?** **A:** In a folder named `data` inside the directory where you run the `.jar` file.
+
+---
+
+## Command Summary
+
+| Action | Format | Example |
+| :--- | :--- | :--- |
+| **Add todo** | `todo DESCRIPTION` | `todo buy bread` |
+| **Add Deadline** | `deadline DESCRIPTION /by YYYY-MM-DD` | `deadline final exam /by 2026-05-15` |
+| **Add Event** | `event DESCRIPTION /from YYYY-MM-DD /to YYYY-MM-DD` | `event camp /from 2026-07-10 /to 2026-07-15` |
+| **List** | `list` | `list` |
+| **Mark** | `mark INDEX` | `mark 3` |
+| **Unmark** | `unmark INDEX` | `unmark 3` |
+| **Delete** | `delete INDEX` | `delete 1` |
+| **Find** | `find KEYWORD` | `find project` |
+| **Exit** | `bye` | `bye` |
